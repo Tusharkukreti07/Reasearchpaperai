@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import multer from "multer";
@@ -23,6 +23,10 @@ import {
   insertResearchGoalSchema,
   Paper
 } from "@shared/schema";
+import { setupAuth } from "./auth";
+import { log } from "./vite";
+import { db } from "./db";
+import { promises as fs } from 'fs';
 
 // Set up multer for file uploads
 const upload = multer({ 
@@ -39,15 +43,29 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Get user (simplified for demo)
-  app.get("/api/user", async (req: Request, res: Response) => {
-    const user = await storage.getUserByUsername("sarah");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+  // Set up authentication
+  setupAuth(app);
+  
+  // Create database schema
+  try {
+    log("Pushing database schema...", "database");
+    // Read schema SQL from file
+    const schemaSQL = await fs.readFile('./server/schema.sql', 'utf8');
+    // Execute schema creation
+    await db.execute(schemaSQL);
+    log("Database schema created successfully", "database");
+  } catch (error) {
+    log(`Error creating database schema: ${error instanceof Error ? error.message : String(error)}`, "database");
+  }
+
+  // User endpoint - authenticated version
+  app.get("/api/user", (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
     }
     
     // Remove password from response
-    const { password, ...userWithoutPassword } = user;
+    const { password, ...userWithoutPassword } = req.user;
     res.json(userWithoutPassword);
   });
 
