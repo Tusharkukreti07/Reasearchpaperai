@@ -1,0 +1,78 @@
+🧩 Contextual Question-Answering by Section
+
+Let users ask questions about a specific section (e.g., Introduction, Methodology).
+
+AI provides section-aware answers with references to paragraph location.
+
+🧪 Methodology Comparator
+
+Extract and compare methodologies across selected papers.
+
+Highlight tools, datasets, sample size, or ML models used.
+
+🧾 Abstract & Title Rewriter
+
+Help users rewrite the abstract or title of their papers with better academic tone or for different audiences (journalistic, layman, etc.).
+
+💡 Auto-Generated Research Gaps
+
+Suggest potential research gaps by analyzing multiple papers in the same domain.
+
+Provide prompt suggestions like: “Few studies address X under condition Y.”
+
+📎 Drag-and-Drop Research Workspace
+
+Visual canvas where users can pin papers, connect them via ideas or topics, and group them into folders or themes.
+
+🛠️ Paper Structuring Assistant
+
+Based on user’s research idea, auto-generate a suggested outline/structure for their new paper.
+
+Example sections: Abstract → Intro → Problem Statement → Literature → Methodology → Results → Conclusion → Future Work.
+
+🎤 Voice Interface
+
+Let users interact with the AI assistant through voice commands (using Web Speech API).
+
+Ask questions like: “Summarize the methodology of the second uploaded paper.”
+
+📅 Timeline of Research Evolution
+
+Show how a research idea evolved over time using uploaded papers and citations.
+
+Chronological view with key milestones and published work.
+
+🧬 Cross-Disciplinary Insight Generator
+
+Identify research overlaps across disciplines using embeddings.
+
+E.g., “Paper on neural networks in medicine also applies in agriculture.”
+
+🎓 Paper Quality Estimator
+
+Rate research papers using metrics like citation count, impact factor of the journal, clarity of abstract, novelty (using AI).
+
+🪄 Smart Automation Tools:
+📝 Research Note-Taking AI
+
+Auto-generate meeting notes, key points, and action items from user queries or readings.
+
+💼 Auto CV/Resume Enhancer
+
+Extract your publications and research experience and format them into a clean academic CV.
+
+📊 Infographic Generator
+
+Automatically generate visuals/graphs for paper insights using keywords and AI (e.g., charts, workflows, mindmaps).
+
+🔬 Paper Peer Review Simulator
+
+Provide mock peer reviews with strengths, weaknesses, and suggestions.
+
+Rate paper as if from an academic reviewer’s lens.
+
+📥 ArXiv/DOI Importer
+
+Import research papers via ArXiv ID, DOI, or URL.
+
+Auto-fetch metadata, abstract, and full text if available.

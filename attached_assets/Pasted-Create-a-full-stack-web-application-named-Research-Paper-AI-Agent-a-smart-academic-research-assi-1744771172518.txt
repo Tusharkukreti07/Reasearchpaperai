@@ -1,0 +1,99 @@
+Create a full-stack web application named "Research Paper AI Agent" — a smart academic research assistant. The app should use AI to assist users in reading, analyzing, and managing research papers.
+
+✅ Core Features:
+📤 PDF Upload & Extraction
+
+Allow users to upload multiple research papers (PDF format).
+
+Extract text using PyMuPDF or pdfplumber (fallback to OCR like Tesseract if text is non-selectable).
+
+🧠 AI-Powered Summarization
+
+Summarize uploaded papers into:
+
+Bullet-point summaries
+
+Section-wise summaries
+
+Graphical abstracts (optional: integrate with image generation APIs)
+
+🔍 Semantic Search
+
+Implement full-text and vector-based semantic search using FAISS, Chroma, or Weaviate.
+
+Return the most relevant passages or documents with highlighted context.
+
+📚 Citation & Reference Generator
+
+Extract citations from the paper.
+
+Format citations into APA, MLA, and BibTeX.
+
+Let users export citations in .bib or .txt.
+
+📊 Citation Graph Visualization
+
+Display an interactive graph of references using D3.js or Vis.js.
+
+Show how uploaded papers are interconnected via citations.
+
+🤖 AI Chat Assistant
+
+Use LangChain + LLM (e.g., GPT-4, Claude, or open-source models).
+
+Let users ask questions about uploaded content.
+
+Support multi-document Q&A.
+
+🧠 Advanced Features:
+📈 Multi-Document Comparison
+
+Compare research aims, datasets, methods, and conclusions.
+
+Highlight key differences and similarities.
+
+🌐 Smart Web Research
+
+Use SerpAPI or Bing Web Search to find the latest research on a topic.
+
+Extract key takeaways from top academic results using AI.
+
+🗃️ Research Topic Clustering
+
+Automatically categorize papers into topics using unsupervised ML (e.g., KMeans + embeddings).
+
+Display them using a topic cloud or list.
+
+📑 Auto-Summarized Literature Reviews
+
+Generate a short literature review based on multiple uploaded papers.
+
+📌 Personalized Recommendations
+
+Based on previously uploaded papers, recommend related research using semantic similarity.
+
+💬 Annotation & Highlighting
+
+Let users highlight text or add notes to specific sections.
+
+Save annotations in MongoDB and allow export.
+
+🔄 Live Collaboration
+
+Real-time document collaboration and chat using WebSockets (like Google Docs).
+
+🧾 Research Logbook Generator
+
+Automatically generate a formatted logbook summarizing your research process, citations, and insights.
+
+📤 Export Options
+
+Export research summary as:
+
+Markdown
+
+PDF
+
+Word Document
+
+Presentation slides (optional integration with reveal.js)
