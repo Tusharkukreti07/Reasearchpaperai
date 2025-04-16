@@ -478,10 +478,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validPapers = papers
         .filter(paper => paper !== undefined)
-        .map(paper => ({
-          title: paper.title,
-          content: paper.content || ''
-        }));
+        .map(paper => {
+          // Extract section-specific content to improve comparison
+          const sections = paper.metadata?.sections || {};
+          const methodsSection = 
+            sections['Methods'] || 
+            sections['Methodology'] || 
+            sections['Experimental Methods'] || 
+            '';
+          
+          const resultsSection = 
+            sections['Results'] || 
+            sections['Findings'] || 
+            sections['Experimental Results'] || 
+            '';
+          
+          const discussionSection = 
+            sections['Discussion'] || 
+            sections['Analysis'] || 
+            '';
+          
+          const conclusionSection = 
+            sections['Conclusion'] || 
+            sections['Conclusions'] || 
+            '';
+          
+          return {
+            title: paper.title,
+            content: paper.content || '',
+            authors: paper.authors || '',
+            abstract: paper.abstract || '',
+            methods: methodsSection,
+            results: resultsSection,
+            discussion: discussionSection,
+            conclusion: conclusionSection
+          };
+        });
       
       if (validPapers.length < 2) {
         return res.status(400).json({ message: "At least 2 valid papers are required for comparison" });
@@ -520,12 +552,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validPapers = papers
         .filter(paper => paper !== undefined)
-        .map(paper => ({
-          title: paper.title,
-          authors: paper.authors || 'Unknown',
-          abstract: paper.abstract || '',
-          year: paper.metadata?.publicationDate || 'Unknown'
-        }));
+        .map(paper => {
+          // Extract publication year from metadata or from content
+          const publicationYear = paper.metadata?.publicationDate || 
+            (paper.content && paper.content.match(/\b(19|20)\d{2}\b/)?.[0]) || 
+            'Unknown';
+          
+          // Extract keywords from metadata if available
+          const keywords = paper.metadata?.keywords || [];
+          
+          return {
+            title: paper.title,
+            authors: paper.authors || 'Unknown',
+            abstract: paper.abstract || '',
+            year: publicationYear,
+            keywords: keywords,
+            // Include additional info that might be useful for literature review
+            journal: paper.metadata?.journal || '',
+            mainFindings: paper.metadata?.mainFindings || ''
+          };
+        });
       
       if (validPapers.length < 2) {
         return res.status(400).json({ message: "At least 2 valid papers are required for a literature review" });

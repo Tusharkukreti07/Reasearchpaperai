@@ -288,12 +288,36 @@ export async function askQuestion(
 /**
  * Generate a literature review based on multiple papers
  */
-export async function generateLiteratureReview(papers: Array<{title: string; authors: string; abstract: string; year: string}>): Promise<string> {
+export async function generateLiteratureReview(papers: Array<{
+  title: string; 
+  authors: string; 
+  abstract: string; 
+  year: string;
+  keywords?: string[];
+  journal?: string;
+  mainFindings?: string;
+}>): Promise<string> {
   try {
-    // Create a context from the papers
-    const context = papers.map(paper => 
-      `Title: ${paper.title}\nAuthors: ${paper.authors}\nYear: ${paper.year}\nAbstract: ${paper.abstract}`
-    ).join('\n\n');
+    // Create a context from the papers with enhanced metadata
+    const context = papers.map(paper => {
+      let paperContext = `Title: ${paper.title}\nAuthors: ${paper.authors}\nYear: ${paper.year}\n`;
+      
+      if (paper.journal && paper.journal.length > 0) {
+        paperContext += `Journal: ${paper.journal}\n`;
+      }
+      
+      paperContext += `Abstract: ${paper.abstract}\n`;
+      
+      if (paper.keywords && paper.keywords.length > 0) {
+        paperContext += `Keywords: ${paper.keywords.join(', ')}\n`;
+      }
+      
+      if (paper.mainFindings && paper.mainFindings.length > 0) {
+        paperContext += `Main Findings: ${paper.mainFindings}\n`;
+      }
+      
+      return paperContext;
+    }).join('\n\n');
 
     const prompt = `Please create a literature review based on these papers:\n\n${context}\n\nThe literature review should include:
       1. An introduction to the research area
@@ -324,7 +348,16 @@ export async function generateLiteratureReview(papers: Array<{title: string; aut
 /**
  * Compare multiple research papers
  */
-export async function comparePapers(papers: Array<{title: string; content: string}>): Promise<{
+export async function comparePapers(papers: Array<{
+  title: string; 
+  content: string;
+  authors?: string;
+  abstract?: string;
+  methods?: string;
+  results?: string;
+  discussion?: string;
+  conclusion?: string;
+}>): Promise<{
   aims: Record<string, string>;
   datasets: Record<string, string>;
   methods: Record<string, string>;
@@ -334,9 +367,40 @@ export async function comparePapers(papers: Array<{title: string; content: strin
   differences: string[];
 }> {
   try {
-    const paperSummaries = papers.map((paper, index) => 
-      `Paper ${index + 1}: ${paper.title}\n\n${paper.content.slice(0, 4000)}`
-    ).join('\n\n---\n\n');
+    const paperSummaries = papers.map((paper, index) => {
+      // Structured format including section-specific content if available
+      let summary = `Paper ${index + 1}: ${paper.title}\n`;
+      
+      if (paper.authors) {
+        summary += `Authors: ${paper.authors}\n`;
+      }
+      
+      if (paper.abstract) {
+        summary += `Abstract: ${paper.abstract}\n`;
+      }
+      
+      // Add section-specific content if available
+      if (paper.methods && paper.methods.length > 100) {
+        summary += `\nMethods: ${paper.methods.slice(0, 1000)}\n`;
+      }
+      
+      if (paper.results && paper.results.length > 100) {
+        summary += `\nResults: ${paper.results.slice(0, 1000)}\n`;
+      }
+      
+      if (paper.discussion && paper.discussion.length > 100) {
+        summary += `\nDiscussion: ${paper.discussion.slice(0, 800)}\n`;
+      }
+      
+      if (paper.conclusion && paper.conclusion.length > 100) {
+        summary += `\nConclusion: ${paper.conclusion.slice(0, 800)}\n`;
+      }
+      
+      // Include some general content to fill gaps
+      summary += `\nAdditional Content: ${paper.content.slice(0, 2000)}`;
+      
+      return summary;
+    }).join('\n\n---\n\n');
 
     const prompt = `Compare the following research papers and provide a structured analysis of their aims, datasets, methods, results, and conclusions. Also identify key similarities and differences.
       
