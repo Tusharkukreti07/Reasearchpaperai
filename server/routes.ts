@@ -349,11 +349,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Get paper summary if available
               const summary = await storage.getSummaryByPaperId(paper.id);
               
+              // Extract sections from metadata if available
+              const sections = paper.metadata?.sections || {};
+              
               return {
                 id: paper.id,
                 title: paper.title,
                 authors: paper.authors || 'Unknown',
                 content: paper.content || '',
+                sections: sections, // Include extracted sections
                 summary: summary ? {
                   bulletPoints: summary.bulletPoints,
                   sectionWise: summary.sectionWise
@@ -375,7 +379,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
                                lowerQuestion.includes('discussion') || 
                                lowerQuestion.includes('conclusion');
       
-      console.log(`Question analysis - Author question: ${isAuthorQuestion}, Section question: ${isSectionQuestion}`);
+      // Check for specific section requests
+      const sectionKeywords = ['introduction', 'methodology', 'methods', 'results', 'discussion', 
+                               'conclusion', 'abstract', 'background', 'literature review', 'references'];
+      
+      // Find which section might be requested
+      let requestedSection = '';
+      for (const keyword of sectionKeywords) {
+        if (lowerQuestion.includes(keyword)) {
+          requestedSection = keyword;
+          break;
+        }
+      }
+      
+      console.log(`Question analysis - Author question: ${isAuthorQuestion}, Section question: ${isSectionQuestion}, Requested section: ${requestedSection}`);
+      
+      // If we have a section-specific question, prioritize the extracted sections in the message
+      if (requestedSection && paperContents.length > 0) {
+        // Enhance context with section-specific information if available
+        paperContents = paperContents.map(paper => {
+          // Check if we have this specific section from OCR extraction
+          const sectionMatches = Object.keys(paper.sections || {})
+            .filter(sectionName => 
+              sectionName.toLowerCase().includes(requestedSection) || 
+              requestedSection.includes(sectionName.toLowerCase()));
+          
+          if (sectionMatches.length > 0) {
+            console.log(`Found matching section "${sectionMatches[0]}" in paper ID ${paper.id}`);
+            
+            // Add special context to highlight this section in the query
+            return {
+              ...paper,
+              relevantSectionName: sectionMatches[0],
+              relevantSectionContent: paper.sections[sectionMatches[0]]
+            };
+          }
+          
+          // Also check in AI-generated summary sections if not found in OCR extraction
+          if (paper.summary?.sectionWise) {
+            const summaryMatches = Object.keys(paper.summary.sectionWise)
+              .filter(sectionName => 
+                sectionName.toLowerCase().includes(requestedSection) ||
+                requestedSection.includes(sectionName.toLowerCase()));
+            
+            if (summaryMatches.length > 0) {
+              console.log(`Found matching section "${summaryMatches[0]}" in AI summary for paper ID ${paper.id}`);
+              
+              return {
+                ...paper,
+                relevantSectionName: summaryMatches[0],
+                relevantSectionContent: paper.summary.sectionWise[summaryMatches[0]]
+              };
+            }
+          }
+          
+          return paper;
+        });
+      }
       
       // Get AI response with enhanced context for specific question types
       const aiResponse = await askQuestion(messageData.content, paperContents);

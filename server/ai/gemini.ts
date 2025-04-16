@@ -208,16 +208,64 @@ export async function formatCitation(
 /**
  * Ask a question about one or more papers
  */
-export async function askQuestion(question: string, paperContents: Array<{id: number; title: string; content: string}>): Promise<string> {
+export async function askQuestion(
+  question: string, 
+  paperContents: Array<{
+    id: number; 
+    title: string; 
+    content: string;
+    authors?: string;
+    sections?: Record<string, string>;
+    relevantSectionName?: string;
+    relevantSectionContent?: string;
+    summary?: {
+      bulletPoints: string;
+      sectionWise: Record<string, string>;
+    } | null;
+  }>
+): Promise<string> {
   try {
-    // Create a context from the papers
-    const context = paperContents.map(paper => 
-      `Paper Title: ${paper.title}\nPaper ID: ${paper.id}\nContent:\n${paper.content.slice(0, 4000)}`
-    ).join('\n\n');
+    // Check if this is a section-specific question
+    const lowerQuestion = question.toLowerCase();
+    const sectionKeywords = ['introduction', 'methodology', 'methods', 'results', 'discussion', 
+                           'conclusion', 'abstract', 'background', 'literature review', 'references'];
+    
+    const isSectionQuestion = sectionKeywords.some(keyword => lowerQuestion.includes(keyword));
+    const isAuthorQuestion = lowerQuestion.includes('author') || lowerQuestion.includes('who wrote');
+    
+    console.log(`AI processing - Section question: ${isSectionQuestion}, Author question: ${isAuthorQuestion}`);
+    
+    // Create a context from the papers, with special handling for section questions
+    const context = paperContents.map(paper => {
+      let paperContext = `Paper Title: ${paper.title}\nPaper ID: ${paper.id}\n`;
+      
+      // Include authors if available (especially for author questions)
+      if (paper.authors) {
+        paperContext += `Authors: ${paper.authors}\n`;
+      }
+      
+      // For section-specific questions, prioritize the relevant section if available
+      if (isSectionQuestion && paper.relevantSectionName && paper.relevantSectionContent) {
+        paperContext += `\nSection: ${paper.relevantSectionName}\nSection Content:\n${paper.relevantSectionContent}\n`;
+        
+        // Include a brief note about the paper's overall content (truncated)
+        paperContext += `\nAdditional Paper Content (excerpt):\n${paper.content.slice(0, 1500)}`;
+      } 
+      // For author questions, prioritize the beginning of the paper where author info is usually found
+      else if (isAuthorQuestion) {
+        paperContext += `\nPaper Content (beginning):\n${paper.content.slice(0, 2000)}`;
+      }
+      // For regular questions
+      else {
+        paperContext += `\nContent:\n${paper.content.slice(0, 4000)}`;
+      }
+      
+      return paperContext;
+    }).join('\n\n');
 
     const prompt = `I have the following research papers:\n\n${context}\n\nMy question is: ${question}`;
     
-    const systemPrompt = "You are a research assistant AI that helps users understand academic papers. Pay careful attention to accurately identifying author names, publication dates, and section details when asked. When users ask about authors, always provide the complete author list with their affiliations if available. For section-specific questions, provide detailed summaries of those sections. Answer questions based on the provided research papers only. If the answer cannot be found in the papers, state that clearly. When referencing information, mention which paper it came from by citing the Paper ID or title.";
+    const systemPrompt = "You are a research assistant AI that helps users understand academic papers. Pay careful attention to accurately identifying author names, publication dates, and section details when asked. When users ask about authors, always provide the complete author list with their affiliations if available. For section-specific questions, provide detailed summaries of those sections with the most relevant information highlighted. Answer questions based only on the provided research papers. If the answer cannot be found in the papers, state that clearly. When referencing information, mention which paper it came from by citing the Paper ID or title.";
     
     const result = await model.generateContent({
       contents: [
