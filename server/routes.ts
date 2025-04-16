@@ -19,7 +19,8 @@ import {
   insertAnnotationSchema,
   insertChatSchema,
   insertMessageSchema,
-  insertResearchGoalSchema
+  insertResearchGoalSchema,
+  Paper
 } from "@shared/schema";
 
 // Set up multer for file uploads
@@ -312,16 +313,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
           paperIds.map(async (id) => await storage.getPaper(id))
         );
         
-        paperContents = papers
-          .filter(paper => paper !== undefined)
-          .map(paper => ({
-            id: paper.id,
-            title: paper.title,
-            content: paper.content || ''
-          }));
+        // Enhance with summaries if available
+        const papersWithSummaries = await Promise.all(
+          papers
+            .filter(paper => paper !== undefined)
+            .map(async (paper) => {
+              // Get paper summary if available
+              const summary = await storage.getSummaryByPaperId(paper.id);
+              
+              return {
+                id: paper.id,
+                title: paper.title,
+                authors: paper.authors || 'Unknown',
+                content: paper.content || '',
+                summary: summary ? {
+                  bulletPoints: summary.bulletPoints,
+                  sectionWise: summary.sectionWise
+                } : null
+              };
+            })
+        );
+        
+        paperContents = papersWithSummaries;
       }
       
-      // Get AI response
+      // Analyze if the question is about authors, sections, or specific paper elements
+      const lowerQuestion = messageData.content.toLowerCase();
+      const isAuthorQuestion = lowerQuestion.includes('author') || lowerQuestion.includes('who wrote');
+      const isSectionQuestion = lowerQuestion.includes('section') || 
+                               lowerQuestion.includes('introduction') || 
+                               lowerQuestion.includes('methodology') || 
+                               lowerQuestion.includes('result') || 
+                               lowerQuestion.includes('discussion') || 
+                               lowerQuestion.includes('conclusion');
+      
+      console.log(`Question analysis - Author question: ${isAuthorQuestion}, Section question: ${isSectionQuestion}`);
+      
+      // Get AI response with enhanced context for specific question types
       const aiResponse = await askQuestion(messageData.content, paperContents);
       
       // Save AI response
@@ -532,16 +560,39 @@ async function processPaperAsync(paperId: number): Promise<void> {
       return;
     }
     
+    console.log(`Processing paper ${paperId}...`);
+    
     // Generate summary using AI
     const summary = await summarizePaper(paper.content);
+    console.log(`Generated summary for paper ${paperId}`);
+    
+    // Save the summary
     await storage.createSummary({
       paperId,
       bulletPoints: summary.bulletPoints,
       sectionWise: summary.sectionWise
     });
     
+    // Extract and update more accurate paper metadata from the AI summary
+    const paperUpdates: Partial<Paper> = { isProcessed: true };
+    
+    // Update authors if found in AI summary and paper doesn't already have authors
+    if (summary.authors && summary.authors.length > 0 && (!paper.authors || paper.authors.trim() === '')) {
+      paperUpdates.authors = summary.authors.join('; ');
+      console.log(`Updated authors for paper ${paperId}: ${paperUpdates.authors}`);
+    }
+    
+    // Update abstract if found in AI summary and paper doesn't already have abstract
+    if (summary.sectionWise && summary.sectionWise['Introduction'] && 
+        (!paper.abstract || paper.abstract.trim() === '')) {
+      paperUpdates.abstract = summary.sectionWise['Introduction'].substring(0, 500);
+      console.log(`Updated abstract for paper ${paperId}`);
+    }
+    
     // Extract citations
     const extractedCitations = await extractCitations(paper.content);
+    console.log(`Extracted ${extractedCitations.length} citations from paper ${paperId}`);
+    
     for (const citation of extractedCitations) {
       await storage.createCitation({
         paperId,
@@ -553,8 +604,8 @@ async function processPaperAsync(paperId: number): Promise<void> {
       });
     }
     
-    // Mark paper as processed
-    await storage.updatePaper(paperId, { isProcessed: true });
+    // Mark paper as processed and update other extracted metadata
+    await storage.updatePaper(paperId, paperUpdates);
     
     console.log(`Completed processing paper ${paperId}`);
   } catch (error) {
