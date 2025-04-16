@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import multer from "multer";
 import { z } from "zod";
 import { extractTextFromPDF, extractMetadataFromPDFText } from "./pdf/extraction";
+import { extractTextFromPDFAdvanced, extractAdvancedMetadataFromText, convertToBasicMetadata } from "./pdf/advanced-extraction";
 import { 
   summarizePaper,
   extractCitations,

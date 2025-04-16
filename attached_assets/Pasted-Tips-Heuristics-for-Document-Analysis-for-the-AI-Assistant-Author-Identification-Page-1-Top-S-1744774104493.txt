@@ -1,0 +1,76 @@
+Tips & Heuristics for Document Analysis (for the AI Assistant):
+Author Identification (Page 1, Top Section):
+
+The names at the top of the first page, usually below the title, are author names.
+
+Author affiliations often follow as footnotes, superscripts, or appear below their names.
+
+Emails (e.g., @university.edu) help confirm author lines.
+
+Title Detection:
+
+The largest bold text on the first page, usually centered and before author names, is the title of the paper.
+
+Titles are often in Title Case or ALL CAPS in some formats.
+
+Abstract Extraction:
+
+Look for the word "Abstract" near the beginning — the paragraph that follows is the abstract.
+
+Abstract usually ends before the keywords or introduction.
+
+Section Headers:
+
+Use headings like “1. Introduction”, “2. Related Work”, etc., to break the document into sections.
+
+Look for consistent numbered or bold/underlined headers.
+
+Figures and Tables:
+
+“Figure X” or “Table X” is followed by a caption — treat these as key insights.
+
+Sometimes the discussion around figures contains core results.
+
+Citation Format Recognition:
+
+APA/IEEE/MLA style citations may appear like:
+
+[1], (Smith et al., 2020), or Smith (2020)
+
+Helps in identifying related work or source credibility.
+
+References Section:
+
+Starts with "References", “Bibliography” or “Works Cited”.
+
+Begins at the end of the paper and usually lists all cited works.
+
+Keywords:
+
+Look for a line starting with “Keywords:” after the abstract — extract terms for tagging and semantic search.
+
+Mathematical Equations:
+
+Inline or centered equations are usually between dollar signs or LaTeX notation ($$, \begin{equation}).
+
+Surrounding text gives context to model assumptions or formulas.
+
+Conclusion Section:
+
+Usually titled “Conclusion” or “Discussion and Future Work”.
+
+Contains final thoughts, findings, and suggestions.
+
+Acknowledgments:
+
+Usually found before references — can be skipped in semantic summarization unless important.
+
+Affiliation-Based Filtering:
+
+If multiple institutions are listed, assume a collaborative paper — useful for network analysis.
+
+PDF Formatting Notes:
+
+Beware of multi-column layouts — process left column before right.
+
+Footnotes and headers (journal names, page numbers) should be filtered out.
