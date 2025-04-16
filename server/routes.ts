@@ -60,12 +60,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const userId = 1; // In a real app, would be from authenticated user
       
-      // Extract text from the PDF
+      // Extract text from the PDF with enhanced OCR if needed
+      console.log("Starting PDF extraction with OCR fallback...");
       const pdfBuffer = req.file.buffer;
-      const extractedText = await extractTextFromPDF(pdfBuffer);
+      const extractedText = await extractTextFromPDFAdvanced(pdfBuffer);
       
-      // Extract metadata from the text
-      const metadata = await extractMetadataFromPDFText(extractedText);
+      console.log(`Extracted ${extractedText.length} characters of text from PDF`);
+      
+      // Try to extract advanced metadata first
+      let metadata;
+      try {
+        console.log("Attempting advanced metadata extraction...");
+        const advancedMetadata = await extractAdvancedMetadataFromText(extractedText);
+        metadata = convertToBasicMetadata(advancedMetadata);
+        
+        // Log what we found
+        console.log("Advanced metadata extraction results:");
+        console.log(`Title: ${metadata.title ? 'Found' : 'Not found'}`);
+        console.log(`Authors: ${metadata.authors ? 'Found' : 'Not found'}`);
+        console.log(`Abstract: ${metadata.abstract ? `Found (${metadata.abstract.length} chars)` : 'Not found'}`);
+        console.log(`Sections: ${Object.keys(metadata.sections || {}).length} found`);
+      } catch (extractError) {
+        console.error("Error in advanced metadata extraction:", 
+                     extractError instanceof Error ? extractError.message : String(extractError));
+        
+        // Fall back to basic metadata extraction
+        console.log("Falling back to basic metadata extraction...");
+        metadata = await extractMetadataFromPDFText(extractedText);
+      }
       
       // Create paper record
       const paper = await storage.createPaper({
@@ -82,7 +104,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Process paper in background (in a real app this would be a job queue)
-      processPaperAsync(paper.id).catch(err => console.error("Error processing paper:", err));
+      processPaperAsync(paper.id).catch(err => 
+        console.error("Error processing paper:", err instanceof Error ? err.message : String(err)));
       
       res.json({ 
         id: paper.id,
@@ -91,8 +114,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Paper uploaded and queued for processing" 
       });
     } catch (error) {
-      console.error("Error uploading paper:", error);
-      res.status(500).json({ message: "Failed to upload paper", error: error.message });
+      console.error("Error uploading paper:", 
+                   error instanceof Error ? error.message : String(error));
+      res.status(500).json({ 
+        message: "Failed to upload paper", 
+        error: error instanceof Error ? error.message : String(error) 
+      });
     }
   });
   
@@ -563,6 +590,68 @@ async function processPaperAsync(paperId: number): Promise<void> {
     
     console.log(`Processing paper ${paperId}...`);
     
+    // First, try to extract better metadata using advanced heuristics
+    console.log(`Applying advanced document analysis heuristics to paper ${paperId}...`);
+    
+    try {
+      const advancedMetadata = await extractAdvancedMetadataFromText(paper.content);
+      
+      // Update paper with improved metadata
+      const paperMetadataUpdates: Partial<Paper> = {};
+      
+      // Update title if found and current one seems like a filename
+      if (advancedMetadata.title && 
+          (paper.title.endsWith('.pdf') || paper.title.length < 10 || paper.title === 'Untitled Document')) {
+        paperMetadataUpdates.title = advancedMetadata.title;
+        console.log(`Updated title from OCR analysis: ${advancedMetadata.title}`);
+      }
+      
+      // Update authors if found and missing
+      if (advancedMetadata.authors && advancedMetadata.authors.length > 0 && 
+          (!paper.authors || paper.authors.trim() === '' || paper.authors === 'Unknown Author(s)')) {
+        paperMetadataUpdates.authors = advancedMetadata.authors.join('; ');
+        console.log(`Updated authors from OCR analysis: ${paperMetadataUpdates.authors}`);
+      }
+      
+      // Update abstract if found and missing
+      if (advancedMetadata.abstract && 
+          (!paper.abstract || paper.abstract.trim() === '' || paper.abstract === 'No abstract available')) {
+        paperMetadataUpdates.abstract = advancedMetadata.abstract;
+        console.log(`Updated abstract from OCR analysis, ${advancedMetadata.abstract.length} characters`);
+      }
+      
+      // Extract section content from OCR
+      const sectionData: Record<string, string> = {};
+      if (advancedMetadata.sections) {
+        Object.keys(advancedMetadata.sections).forEach(section => {
+          if (advancedMetadata.sections && advancedMetadata.sections[section]) {
+            sectionData[section] = advancedMetadata.sections[section];
+          }
+        });
+        console.log(`Extracted ${Object.keys(sectionData).length} sections from OCR analysis`);
+      }
+      
+      // Update paper metadata if we found improvements
+      if (Object.keys(paperMetadataUpdates).length > 0) {
+        console.log(`Updating paper ${paperId} with improved metadata from OCR analysis`);
+        // Add the section data to metadata
+        const updatedMetadata = {
+          ...paper.metadata,
+          sections: sectionData,
+          figures: advancedMetadata.figures || [],
+          tables: advancedMetadata.tables || [],
+          keywords: advancedMetadata.keywords || []
+        };
+        paperMetadataUpdates.metadata = updatedMetadata;
+        
+        await storage.updatePaper(paperId, paperMetadataUpdates);
+      }
+    } catch (analysisError) {
+      console.error(`Error during advanced metadata extraction for paper ${paperId}:`, 
+                   analysisError instanceof Error ? analysisError.message : String(analysisError));
+      // Continue with normal processing even if advanced extraction fails
+    }
+    
     // Generate summary using AI
     const summary = await summarizePaper(paper.content);
     console.log(`Generated summary for paper ${paperId}`);
@@ -610,6 +699,7 @@ async function processPaperAsync(paperId: number): Promise<void> {
     
     console.log(`Completed processing paper ${paperId}`);
   } catch (error) {
-    console.error(`Error processing paper ${paperId}:`, error);
+    console.error(`Error processing paper ${paperId}:`, 
+                 error instanceof Error ? error.message : String(error));
   }
 }

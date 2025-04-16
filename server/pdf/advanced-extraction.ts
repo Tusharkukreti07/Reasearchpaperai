@@ -2,8 +2,8 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
 import { createWorker } from 'tesseract.js';
-import pdfParse from 'pdf-parse';
 import { savePDFToTempFile, cleanupTempFile, ExtractedMetadata } from './extraction';
+import pdfParse from './custom-pdf-parse';
 
 // PDF parse options
 const PDF_PARSE_OPTIONS = {
@@ -21,9 +21,10 @@ export async function extractTextFromPDFAdvanced(pdfBuffer: Buffer): Promise<str
   try {
     console.log('Starting advanced text extraction from PDF...');
     
-    // First try with pdf-parse for regular text extraction
+    // First try with our custom pdf-parse for regular text extraction
     try {
       console.log('Attempting regular text extraction...');
+      
       const pdfData = await pdfParse(pdfBuffer, PDF_PARSE_OPTIONS);
       
       // If we got a reasonable amount of text, use it
@@ -34,7 +35,7 @@ export async function extractTextFromPDFAdvanced(pdfBuffer: Buffer): Promise<str
       
       console.log('Regular extraction yielded insufficient text. Falling back to OCR...');
     } catch (pdfParseError) {
-      console.error('Error with regular PDF extraction:', pdfParseError);
+      console.error('Error with regular PDF extraction:', pdfParseError instanceof Error ? pdfParseError.message : String(pdfParseError));
       console.log('Falling back to OCR...');
     }
     
@@ -49,7 +50,7 @@ export async function extractTextFromPDFAdvanced(pdfBuffer: Buffer): Promise<str
     // If all methods fail, return an error message
     return 'Failed to extract meaningful text from this PDF. The PDF may be scanned, encrypted, or contain no text content.';
   } catch (error) {
-    console.error('Error extracting text from PDF:', error);
+    console.error('Error extracting text from PDF:', error instanceof Error ? error.message : String(error));
     throw new Error('Failed to extract text from PDF');
   }
 }

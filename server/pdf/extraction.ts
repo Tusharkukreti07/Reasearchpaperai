@@ -65,6 +65,7 @@ export interface ExtractedMetadata {
   publicationDate?: string;
   journal?: string;
   keywords?: string[];
+  sections?: Record<string, string>;
 }
 
 export async function extractMetadataFromPDFText(text: string): Promise<ExtractedMetadata> {
