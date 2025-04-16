@@ -100,7 +100,6 @@ export const insertPaperSchema = createInsertSchema(papers).omit({
   id: true,
   uploadDate: true,
   isProcessed: true,
-  content: true,
 });
 
 export const insertSummarySchema = createInsertSchema(summaries).omit({

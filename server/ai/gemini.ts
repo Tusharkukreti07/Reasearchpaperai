@@ -32,20 +32,38 @@ const safetySettings = [
  * Summarize text content from a research paper
  */
 export async function summarizePaper(content: string): Promise<{
+  authors?: string[];
+  affiliations?: string;
+  publicationInfo?: string;
   bulletPoints: string;
   sectionWise: Record<string, string>;
 }> {
   try {
-    const prompt = `Please summarize the following research paper in two formats:
-      1. A bullet-point summary of the key findings, methods, and conclusions
-      2. A section-wise summary with common sections like Introduction, Methodology, Results, Discussion, etc.
+    const prompt = `Please thoroughly analyze and summarize the following research paper:
+
+      1. Identify the authors and their affiliations
+      2. Identify the publication date and journal/conference if available
+      3. Provide a bullet-point summary of the key findings, methods, and conclusions
+      4. Create a detailed section-by-section summary with the following common sections:
+         - Introduction and background
+         - Literature review or related work
+         - Methodology or approach
+         - Results or findings
+         - Discussion
+         - Conclusion
+         - Limitations and future work
       
-      Format your response as JSON with keys "bulletPoints" and "sectionWise" (which should be an object with section names as keys).
+      Be thorough in your summary of each section. Format your response as JSON with these keys:
+      - "authors": Array of author names
+      - "affiliations": String of author affiliations
+      - "publicationInfo": Publication date and journal/venue
+      - "bulletPoints": Bullet point summary of key points
+      - "sectionWise": Object with section names as keys and detailed summaries as values
       
       Here is the paper content:
       ${content.slice(0, 8000)}`; // Limit to first 8000 chars to stay within token limits
 
-    const systemPrompt = "You are an academic research assistant tasked with analyzing and summarizing research papers. Extract the key information and organize it into a concise summary.";
+    const systemPrompt = "You are an academic research assistant tasked with thoroughly analyzing and summarizing research papers. Carefully extract all key information including author details and provide comprehensive section summaries. Be extremely attentive to author names and ensure they are correctly extracted.";
     
     const result = await model.generateContent({
       contents: [
@@ -198,7 +216,8 @@ export async function askQuestion(question: string, paperContents: Array<{id: nu
     ).join('\n\n');
 
     const prompt = `I have the following research papers:\n\n${context}\n\nMy question is: ${question}`;
-    const systemPrompt = "You are a research assistant AI that helps users understand academic papers. Answer questions based on the provided research papers only. If the answer cannot be found in the papers, state that clearly. When referencing information, mention which paper it came from by citing the Paper ID or title.";
+    
+    const systemPrompt = "You are a research assistant AI that helps users understand academic papers. Pay careful attention to accurately identifying author names, publication dates, and section details when asked. When users ask about authors, always provide the complete author list with their affiliations if available. For section-specific questions, provide detailed summaries of those sections. Answer questions based on the provided research papers only. If the answer cannot be found in the papers, state that clearly. When referencing information, mention which paper it came from by citing the Paper ID or title.";
     
     const result = await model.generateContent({
       contents: [
