@@ -12,7 +12,7 @@ import {
   ExportIcon,
   UserIcon
 } from '@/lib/icons';
-import useMobile from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavItemProps {
   href: string;
@@ -43,7 +43,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isActive }) => {
 
 const Sidebar: React.FC = () => {
   const [location] = useLocation();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
 
   return (
     <aside className="w-16 md:w-64 bg-white border-r border-neutral-200 flex flex-col transition-all duration-300 ease-in-out">

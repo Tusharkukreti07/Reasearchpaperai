@@ -11,7 +11,7 @@ import {
   askQuestion,
   generateLiteratureReview,
   comparePapers
-} from "./ai/openai";
+} from "./ai/gemini";
 import {
   insertPaperSchema,
   insertSummarySchema,
