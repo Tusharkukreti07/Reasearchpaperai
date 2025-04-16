@@ -6,10 +6,15 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password"), // Optional for social logins
   displayName: text("display_name"),
+  email: text("email").notNull().unique(),
+  profilePicture: text("profile_picture"),
+  googleId: text("google_id").unique(),
+  githubId: text("github_id").unique(), 
   role: text("role").default("researcher"),
   createdAt: timestamp("created_at").defaultNow(),
+  lastLogin: timestamp("last_login"),
 });
 
 // Paper model
@@ -93,7 +98,13 @@ export const researchGoals = pgTable("research_goals", {
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ 
   id: true, 
-  createdAt: true 
+  createdAt: true,
+  lastLogin: true,
+  googleId: true,
+  githubId: true
+}).extend({
+  email: z.string().email(),
+  password: z.string().optional() // Optional for OAuth logins
 });
 
 export const insertPaperSchema = createInsertSchema(papers).omit({

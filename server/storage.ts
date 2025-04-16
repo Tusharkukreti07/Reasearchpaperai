@@ -344,4 +344,215 @@ export class MemStorage implements IStorage {
 }
 
 // Initialize storage
-export const storage = new MemStorage();
+// Database storage implementation
+import { db, pool } from './db';
+import { eq, and, desc } from 'drizzle-orm';
+import connectPg from "connect-pg-simple";
+import session from "express-session";
+
+const PostgresSessionStore = connectPg(session);
+
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.SessionStore;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
+    });
+  }
+
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const [newUser] = await db.insert(users).values(user).returning();
+    return newUser;
+  }
+
+  // Paper methods
+  async getPaper(id: number): Promise<Paper | undefined> {
+    const [paper] = await db.select().from(papers).where(eq(papers.id, id));
+    return paper;
+  }
+
+  async getPapersByUserId(userId: number): Promise<Paper[]> {
+    return await db.select().from(papers).where(eq(papers.userId, userId)).orderBy(desc(papers.uploadDate));
+  }
+
+  async createPaper(paper: InsertPaper): Promise<Paper> {
+    const [newPaper] = await db.insert(papers).values(paper).returning();
+    return newPaper;
+  }
+
+  async updatePaper(id: number, paperUpdate: Partial<Paper>): Promise<Paper | undefined> {
+    const [updatedPaper] = await db
+      .update(papers)
+      .set(paperUpdate)
+      .where(eq(papers.id, id))
+      .returning();
+    return updatedPaper;
+  }
+
+  async deletePaper(id: number): Promise<boolean> {
+    const result = await db.delete(papers).where(eq(papers.id, id));
+    return result.count > 0;
+  }
+
+  // Annotation methods
+  async getAnnotation(id: number): Promise<Annotation | undefined> {
+    const [annotation] = await db.select().from(annotations).where(eq(annotations.id, id));
+    return annotation;
+  }
+
+  async getAnnotationsByPaperId(paperId: number): Promise<Annotation[]> {
+    return await db.select().from(annotations).where(eq(annotations.paperId, paperId));
+  }
+
+  async createAnnotation(annotation: InsertAnnotation): Promise<Annotation> {
+    const [newAnnotation] = await db.insert(annotations).values(annotation).returning();
+    return newAnnotation;
+  }
+
+  async updateAnnotation(id: number, annotationUpdate: Partial<Annotation>): Promise<Annotation | undefined> {
+    const [updatedAnnotation] = await db
+      .update(annotations)
+      .set(annotationUpdate)
+      .where(eq(annotations.id, id))
+      .returning();
+    return updatedAnnotation;
+  }
+
+  async deleteAnnotation(id: number): Promise<boolean> {
+    const result = await db.delete(annotations).where(eq(annotations.id, id));
+    return result.count > 0;
+  }
+
+  // Citation methods
+  async getCitation(id: number): Promise<Citation | undefined> {
+    const [citation] = await db.select().from(citations).where(eq(citations.id, id));
+    return citation;
+  }
+
+  async getCitationsByPaperId(paperId: number): Promise<Citation[]> {
+    return await db.select().from(citations).where(eq(citations.paperId, paperId));
+  }
+
+  async createCitation(citation: InsertCitation): Promise<Citation> {
+    const [newCitation] = await db.insert(citations).values(citation).returning();
+    return newCitation;
+  }
+
+  async deleteCitation(id: number): Promise<boolean> {
+    const result = await db.delete(citations).where(eq(citations.id, id));
+    return result.count > 0;
+  }
+
+  // Summary methods
+  async getSummary(id: number): Promise<Summary | undefined> {
+    const [summary] = await db.select().from(summaries).where(eq(summaries.id, id));
+    return summary;
+  }
+
+  async getSummaryByPaperId(paperId: number): Promise<Summary | undefined> {
+    const [summary] = await db.select().from(summaries).where(eq(summaries.paperId, paperId));
+    return summary;
+  }
+
+  async createSummary(summary: InsertSummary): Promise<Summary> {
+    const [newSummary] = await db.insert(summaries).values(summary).returning();
+    return newSummary;
+  }
+
+  async updateSummary(id: number, summaryUpdate: Partial<Summary>): Promise<Summary | undefined> {
+    const [updatedSummary] = await db
+      .update(summaries)
+      .set(summaryUpdate)
+      .where(eq(summaries.id, id))
+      .returning();
+    return updatedSummary;
+  }
+
+  // Chat methods
+  async getChat(id: number): Promise<Chat | undefined> {
+    const [chat] = await db.select().from(chats).where(eq(chats.id, id));
+    return chat;
+  }
+
+  async getChatsByUserId(userId: number): Promise<Chat[]> {
+    return await db.select().from(chats).where(eq(chats.userId, userId)).orderBy(desc(chats.createdAt));
+  }
+
+  async createChat(chat: InsertChat): Promise<Chat> {
+    const [newChat] = await db.insert(chats).values(chat).returning();
+    return newChat;
+  }
+
+  async updateChat(id: number, title: string): Promise<Chat | undefined> {
+    const [updatedChat] = await db
+      .update(chats)
+      .set({ title })
+      .where(eq(chats.id, id))
+      .returning();
+    return updatedChat;
+  }
+
+  async deleteChat(id: number): Promise<boolean> {
+    const result = await db.delete(chats).where(eq(chats.id, id));
+    return result.count > 0;
+  }
+
+  // Message methods
+  async getMessage(id: number): Promise<Message | undefined> {
+    const [message] = await db.select().from(messages).where(eq(messages.id, id));
+    return message;
+  }
+
+  async getMessagesByChatId(chatId: number): Promise<Message[]> {
+    return await db.select().from(messages).where(eq(messages.chatId, chatId)).orderBy(messages.createdAt);
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const [newMessage] = await db.insert(messages).values(message).returning();
+    return newMessage;
+  }
+
+  // Research Goal methods
+  async getResearchGoal(id: number): Promise<ResearchGoal | undefined> {
+    const [goal] = await db.select().from(researchGoals).where(eq(researchGoals.id, id));
+    return goal;
+  }
+
+  async getResearchGoalsByUserId(userId: number): Promise<ResearchGoal[]> {
+    return await db.select().from(researchGoals).where(eq(researchGoals.userId, userId));
+  }
+
+  async createResearchGoal(goal: InsertResearchGoal): Promise<ResearchGoal> {
+    const [newGoal] = await db.insert(researchGoals).values(goal).returning();
+    return newGoal;
+  }
+
+  async updateResearchGoal(id: number, goalUpdate: Partial<ResearchGoal>): Promise<ResearchGoal | undefined> {
+    const [updatedGoal] = await db
+      .update(researchGoals)
+      .set(goalUpdate)
+      .where(eq(researchGoals.id, id))
+      .returning();
+    return updatedGoal;
+  }
+
+  async deleteResearchGoal(id: number): Promise<boolean> {
+    const result = await db.delete(researchGoals).where(eq(researchGoals.id, id));
+    return result.count > 0;
+  }
+}
+
+export const storage = new DatabaseStorage();
