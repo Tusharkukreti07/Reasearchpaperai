@@ -31,6 +31,25 @@ A comprehensive AI-powered platform for managing, analyzing, and enhancing resea
   - Track document quality metrics over time
   - Receive specific suggestions for enhancement
 
+- **Citation Generator**:
+  - Generate citations in multiple formats (APA, MLA, Chicago, Harvard, IEEE)
+  - Create citations from URLs, DOIs, or manual entry
+  - Copy or download formatted citations
+  - Batch process multiple citations at once
+
+- **Research Collaboration**:
+  - Create collaborative research projects
+  - Invite colleagues to view or edit documents
+  - Real-time discussion and commenting
+  - Track changes and contributions
+  - Manage access permissions
+
+- **Literature Review Assistant**:
+  - Organize papers into thematic groups
+  - Generate structured literature reviews
+  - Identify gaps and connections between papers
+  - Get AI-powered suggestions for improving your review
+
 ## Technology Stack
 
 ### Frontend
