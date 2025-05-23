@@ -13,6 +13,7 @@ import {
   UserIcon,
   EditIcon
 } from '@/lib/icons';
+import { BookOpen, FileText, Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavItemProps {
@@ -120,6 +121,24 @@ const Sidebar: React.FC = () => {
               icon={<i className="ri-file-search-line w-5 h-5" />} 
               label="Document Analyzer" 
               isActive={location === '/document-analyzer'} 
+            />
+            <NavItem 
+              href="/citation-generator" 
+              icon={<i className="ri-links-line w-5 h-5" />} 
+              label="Citation Generator" 
+              isActive={location === '/citation-generator'} 
+            />
+            <NavItem 
+              href="/literature-review" 
+              icon={<BookOpen className="w-5 h-5" />} 
+              label="Literature Review" 
+              isActive={location === '/literature-review'} 
+            />
+            <NavItem 
+              href="/research-collaboration" 
+              icon={<Users className="w-5 h-5" />} 
+              label="Collaboration" 
+              isActive={location === '/research-collaboration'} 
             />
             <NavItem 
               href="/export" 
