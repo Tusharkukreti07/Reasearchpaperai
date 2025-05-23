@@ -13,7 +13,7 @@ import {
   UserIcon,
   EditIcon
 } from '@/lib/icons';
-import { BookOpen, FileText, Users, BookmarkIcon as BookmarkLucide, PenLine, BarChart2 } from 'lucide-react';
+import { BookOpen, FileText, Users, BookmarkIcon as BookmarkLucide, PenLine, BarChart2, BookCopy, MessageSquare, Image } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavItemProps {
@@ -157,6 +157,24 @@ const Sidebar: React.FC = () => {
               icon={<BarChart2 className="w-5 h-5" />} 
               label="Trend Analyzer" 
               isActive={location === '/research-trend-analyzer'} 
+            />
+            <NavItem 
+              href="/journal-recommender" 
+              icon={<BookCopy className="w-5 h-5" />} 
+              label="Journal Recommender" 
+              isActive={location === '/journal-recommender'} 
+            />
+            <NavItem 
+              href="/peer-review-simulator" 
+              icon={<MessageSquare className="w-5 h-5" />} 
+              label="Peer Review Simulator" 
+              isActive={location === '/peer-review-simulator'} 
+            />
+            <NavItem 
+              href="/visual-abstract-creator" 
+              icon={<Image className="w-5 h-5" />} 
+              label="Visual Abstract Creator" 
+              isActive={location === '/visual-abstract-creator'} 
             />
             <NavItem 
               href="/export" 

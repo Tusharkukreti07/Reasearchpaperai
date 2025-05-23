@@ -71,6 +71,27 @@ A comprehensive AI-powered platform for managing, analyzing, and enhancing resea
   - Track author influence and collaboration networks
   - Generate reports on research momentum
 
+- **Journal Recommender**:
+  - Find the perfect journals for your research paper
+  - Filter by impact factor, open access, and review time
+  - Get personalized recommendations based on your abstract
+  - Compare journal metrics and acceptance rates
+  - Export journal lists for future reference
+
+- **Peer Review Simulator**:
+  - Simulate realistic peer review feedback before submission
+  - Choose reviewer personality types (supportive, critical, etc.)
+  - Get section-by-section analysis and improvement suggestions
+  - Draft responses to reviewer comments
+  - Increase your chances of manuscript acceptance
+
+- **Visual Abstract Creator**:
+  - Create compelling visual abstracts to increase research visibility
+  - Choose from multiple professional templates
+  - Customize colors, layouts, and design elements
+  - Generate high-quality images for social media and presentations
+  - Export in multiple formats (PNG, PDF, PowerPoint)
+
 ## Technology Stack
 
 ### Frontend

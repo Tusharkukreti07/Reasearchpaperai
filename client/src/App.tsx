@@ -21,6 +21,9 @@ import LiteratureReviewPage from "@/pages/literature-review";
 import SmartReferenceManagerPage from "@/pages/smart-reference-manager";
 import AcademicWritingAssistantPage from "@/pages/academic-writing-assistant";
 import ResearchTrendAnalyzerPage from "@/pages/research-trend-analyzer";
+import JournalRecommenderPage from "@/pages/journal-recommender";
+import PeerReviewSimulatorPage from "@/pages/peer-review-simulator";
+import VisualAbstractCreatorPage from "@/pages/visual-abstract-creator";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -43,6 +46,9 @@ function Router() {
       <Route path="/smart-reference-manager" component={SmartReferenceManagerPage} />
       <Route path="/academic-writing-assistant" component={AcademicWritingAssistantPage} />
       <Route path="/research-trend-analyzer" component={ResearchTrendAnalyzerPage} />
+      <Route path="/journal-recommender" component={JournalRecommenderPage} />
+      <Route path="/peer-review-simulator" component={PeerReviewSimulatorPage} />
+      <Route path="/visual-abstract-creator" component={VisualAbstractCreatorPage} />
       <Route component={NotFound} />
     </Switch>
   );
