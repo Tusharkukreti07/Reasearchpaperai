@@ -13,7 +13,7 @@ import {
   UserIcon,
   EditIcon
 } from '@/lib/icons';
-import { BookOpen, FileText, Users } from 'lucide-react';
+import { BookOpen, FileText, Users, BookmarkIcon as BookmarkLucide, PenLine, BarChart2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavItemProps {
@@ -139,6 +139,24 @@ const Sidebar: React.FC = () => {
               icon={<Users className="w-5 h-5" />} 
               label="Collaboration" 
               isActive={location === '/research-collaboration'} 
+            />
+            <NavItem 
+              href="/smart-reference-manager" 
+              icon={<BookmarkLucide className="w-5 h-5" />} 
+              label="Reference Manager" 
+              isActive={location === '/smart-reference-manager'} 
+            />
+            <NavItem 
+              href="/academic-writing-assistant" 
+              icon={<PenLine className="w-5 h-5" />} 
+              label="Writing Assistant" 
+              isActive={location === '/academic-writing-assistant'} 
+            />
+            <NavItem 
+              href="/research-trend-analyzer" 
+              icon={<BarChart2 className="w-5 h-5" />} 
+              label="Trend Analyzer" 
+              isActive={location === '/research-trend-analyzer'} 
             />
             <NavItem 
               href="/export" 

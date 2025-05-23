@@ -50,6 +50,27 @@ A comprehensive AI-powered platform for managing, analyzing, and enhancing resea
   - Identify gaps and connections between papers
   - Get AI-powered suggestions for improving your review
 
+- **Smart Reference Manager**:
+  - Automatically organize and categorize references
+  - Import references from multiple sources (BibTeX, EndNote, Zotero)
+  - Detect and merge duplicate references
+  - Generate formatted bibliographies in any citation style
+  - Track citation metrics and impact factors
+
+- **Academic Writing Assistant**:
+  - Get real-time writing suggestions as you type
+  - Check grammar, style, and academic tone
+  - Receive discipline-specific writing recommendations
+  - Access templates for different paper sections
+  - Get help with structuring arguments and transitions
+
+- **Research Trend Analyzer**:
+  - Visualize research trends over time
+  - Identify emerging topics in your field
+  - Compare publication patterns across journals
+  - Track author influence and collaboration networks
+  - Generate reports on research momentum
+
 ## Technology Stack
 
 ### Frontend

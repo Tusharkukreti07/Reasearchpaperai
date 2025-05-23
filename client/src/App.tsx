@@ -18,6 +18,9 @@ import DocumentAnalyzerPage from "@/pages/document-analyzer";
 import CitationGeneratorPage from "@/pages/citation-generator";
 import ResearchCollaborationPage from "@/pages/research-collaboration";
 import LiteratureReviewPage from "@/pages/literature-review";
+import SmartReferenceManagerPage from "@/pages/smart-reference-manager";
+import AcademicWritingAssistantPage from "@/pages/academic-writing-assistant";
+import ResearchTrendAnalyzerPage from "@/pages/research-trend-analyzer";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -37,6 +40,9 @@ function Router() {
       <Route path="/citation-generator" component={CitationGeneratorPage} />
       <Route path="/research-collaboration" component={ResearchCollaborationPage} />
       <Route path="/literature-review" component={LiteratureReviewPage} />
+      <Route path="/smart-reference-manager" component={SmartReferenceManagerPage} />
+      <Route path="/academic-writing-assistant" component={AcademicWritingAssistantPage} />
+      <Route path="/research-trend-analyzer" component={ResearchTrendAnalyzerPage} />
       <Route component={NotFound} />
     </Switch>
   );
