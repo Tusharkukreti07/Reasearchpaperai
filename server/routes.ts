@@ -27,6 +27,7 @@ import { setupAuth } from "./auth";
 import { log } from "./vite";
 import { db } from "./db";
 import { promises as fs } from 'fs';
+import plagiarismRoutes from './routes/plagiarism';
 
 // Set up multer for file uploads
 const upload = multer({ 
@@ -57,6 +58,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   } catch (error) {
     log(`Error creating database schema: ${error instanceof Error ? error.message : String(error)}`, "database");
   }
+  
+  // Register plagiarism routes
+  app.use('/api/plagiarism', plagiarismRoutes);
 
   // User endpoint - authenticated version
   app.get("/api/user", (req: Request, res: Response) => {

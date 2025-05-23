@@ -10,7 +10,8 @@ import {
   CompareIcon,
   BookmarkIcon,
   ExportIcon,
-  UserIcon
+  UserIcon,
+  EditIcon
 } from '@/lib/icons';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -107,6 +108,18 @@ const Sidebar: React.FC = () => {
               icon={<BookmarkIcon className="w-5 h-5" />} 
               label="Annotations" 
               isActive={location === '/annotations'} 
+            />
+            <NavItem 
+              href="/plagiarism-checker" 
+              icon={<i className="ri-shield-check-line w-5 h-5" />} 
+              label="Plagiarism Checker" 
+              isActive={location === '/plagiarism-checker'} 
+            />
+            <NavItem 
+              href="/document-analyzer" 
+              icon={<i className="ri-file-search-line w-5 h-5" />} 
+              label="Document Analyzer" 
+              isActive={location === '/document-analyzer'} 
             />
             <NavItem 
               href="/export" 

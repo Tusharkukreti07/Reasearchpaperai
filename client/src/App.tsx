@@ -12,6 +12,9 @@ import CitationGraph from "@/pages/citation-graph";
 import ComparePapers from "@/pages/compare-papers";
 import Annotations from "@/pages/annotations";
 import Export from "@/pages/export";
+import PDFEditorPage from "@/pages/pdf-editor";
+import PlagiarismCheckerPage from "@/pages/plagiarism-checker";
+import DocumentAnalyzerPage from "@/pages/document-analyzer";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,6 +28,9 @@ function Router() {
       <Route path="/compare-papers" component={ComparePapers} />
       <Route path="/annotations" component={Annotations} />
       <Route path="/export" component={Export} />
+      <Route path="/pdf-editor/:id" component={PDFEditorPage} />
+      <Route path="/plagiarism-checker" component={PlagiarismCheckerPage} />
+      <Route path="/document-analyzer" component={DocumentAnalyzerPage} />
       <Route component={NotFound} />
     </Switch>
   );
