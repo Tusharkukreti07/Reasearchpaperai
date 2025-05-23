@@ -1,6 +1,6 @@
 # Research Paper AI Agent
 
-A comprehensive AI-powered platform for managing, analyzing, and enhancing research papers.
+A comprehensive AI-powered platform for managing, analyzing, and enhancing research papers with advanced document tools.
 
 ## Features
 
