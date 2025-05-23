@@ -15,6 +15,9 @@ import Export from "@/pages/export";
 import PDFEditorPage from "@/pages/pdf-editor";
 import PlagiarismCheckerPage from "@/pages/plagiarism-checker";
 import DocumentAnalyzerPage from "@/pages/document-analyzer";
+import CitationGeneratorPage from "@/pages/citation-generator";
+import ResearchCollaborationPage from "@/pages/research-collaboration";
+import LiteratureReviewPage from "@/pages/literature-review";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -31,6 +34,9 @@ function Router() {
       <Route path="/pdf-editor/:id" component={PDFEditorPage} />
       <Route path="/plagiarism-checker" component={PlagiarismCheckerPage} />
       <Route path="/document-analyzer" component={DocumentAnalyzerPage} />
+      <Route path="/citation-generator" component={CitationGeneratorPage} />
+      <Route path="/research-collaboration" component={ResearchCollaborationPage} />
+      <Route path="/literature-review" component={LiteratureReviewPage} />
       <Route component={NotFound} />
     </Switch>
   );
